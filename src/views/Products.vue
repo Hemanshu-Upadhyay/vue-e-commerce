@@ -19,62 +19,21 @@
 
       <hr />
     </div>
-    <h3>Add Products</h3>
-    <div class="mb-3">
-      <label for="exampleFormControlInput1" class="form-label">Name</label>
-      <input
-        type="name"
-        v-model="product.name"
-        class="form-control"
-        id="exampleFormControlInput1"
-        placeholder="Enter Product name"
-      />
-      <label for="exampleFormControlInput1" class="form-label"
-        >Description</label
-      >
-      <textarea
-        class="form-control"
-        v-model="product.description"
-        id="exampleFormControlTextarea1"
-        rows="3"
-      ></textarea>
-      <label for="exampleFormControlInput1" class="form-label">Price</label>
-      <input
-        type="Price"
-        v-model="product.price"
-        class="form-control"
-        id="exampleFormControlInput1"
-        placeholder="Enter Product Price"
-      />
-      <label for="exampleFormControlInput1" class="form-label">Tags</label>
-      <input
-        type="tags"
-        v-model="product.tags"
-        class="form-control"
-        id="exampleFormControlInput1"
-        placeholder="Enter Product Tags"
-      />
-    </div>
     <!-- <div class="form-group">
       <label for="product_image">Product Images</label>
       <input type="file" @change="uploadImage" class="form-control" />
     </div> -->
-
-    <div class="form-group d-flex">
-      <div class="p-1" v-for="(image, index) in product.images">
-        <div class="img-wrapp">
-          <img :src="image" alt="" width="80px" />
-          <span class="delete-img" @click="deleteImage(image, index)">X</span>
-        </div>
-      </div>
-    </div>
-    <button @click="addProduct()" type="button" class="mt-3 btn btn-primary">
-      Add Product
-    </button>
+    <router-link
+      to="/admin/addproducts"
+      type="button"
+      class="mt-3 btn btn-primary"
+      >Add Product</router-link
+    >
     <div class="mb-3"></div>
   </div>
 
   <!-- Create Product Table -->
+  <!-- Put a condition To show No Products when there is No Products -->
   <div class="container">
     <h3>Product List</h3>
     <div class="row">
@@ -207,6 +166,8 @@
 </template>
 
 <script>
+import { Toast } from "bootstrap";
+import Swal from "sweetalert2";
 import { fb, db } from "../Firebase";
 export default {
   name: "Products",
@@ -261,13 +222,8 @@ export default {
         .then(() => {
           this.reset();
           this.modal.hide();
-          this.readData();
+          window.location.reload();
         });
-    },
-    editProduct(product) {
-      this.modal = "edit";
-      this.product = product;
-      $("#product").modal("show");
     },
     readData() {
       db.collection("products")
@@ -276,26 +232,7 @@ export default {
           querySnapshot.forEach((doc) => {
             this.products.push(doc);
           });
-          console.log(this.products);
         });
-    },
-    addProduct() {
-      db.collection("products")
-        .add(this.product)
-        .then((docRef) => {
-          console.log("Document written with ID: ", docRef.id);
-          this.readData();
-          this.reset();
-        })
-        .catch((error) => {
-          console.error("Error adding document: ", error);
-        });
-      Swal.fire({
-        icon: "success",
-        title: "Product Added Successfully",
-        showConfirmButton: false,
-        timer: 1500,
-      });
     },
     deleteProduct(doc) {
       Swal.fire({
@@ -313,12 +250,12 @@ export default {
             .delete()
             .then(() => {
               console.log("Document successfully deleted!");
+              window.location.reload();
             })
             .catch((error) => {
               console.error("Error removing document: ", error);
             });
           Swal.fire("Deleted!", "Your file has been deleted.", "success");
-          this.readData();
         }
       });
     },

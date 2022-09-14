@@ -62,6 +62,7 @@ export default {
   methods: {
     register() {
       fb.auth()
+        // Also send the name to the database
         .createUserWithEmailAndPassword(this.email, this.password)
         .then((user) => {
           db.collection("profiles")
@@ -75,6 +76,12 @@ export default {
             .catch(function (error) {
               console.error("Error writing document: ", error);
             });
+          Swal.fire({
+            icon: "success",
+            title: "Signup Succssfully",
+            showConfirmButton: false,
+            timer: 1500,
+          });
           this.$router.replace("login");
         })
         .catch(function (error) {
@@ -84,7 +91,12 @@ export default {
           if (errorCode == "auth/weak-password") {
             alert("The password is too weak.");
           } else {
-            alert(errorMessage);
+            Swal.fire({
+              icon: "error",
+              title: errorMessage,
+              showConfirmButton: true,
+              timer: 2000,
+            });
           }
           console.log(error);
         });

@@ -1,125 +1,76 @@
 <template>
   <div class="products">
-    <hr />
-
-    <div class="product-test">
-      <h3 class="d-inline-block">Add Products</h3>
+    <h3>Add Products</h3>
+    <div class="mb-3">
+      <label for="exampleFormControlInput1" class="form-label">Name</label>
+      <input
+        type="name"
+        v-model="product.name"
+        class="form-control"
+        id="exampleFormControlInput1"
+        placeholder="Enter Product name"
+      />
+      <label for="exampleFormControlInput1" class="form-label"
+        >Description</label
+      >
+      <textarea
+        class="form-control"
+        v-model="product.description"
+        id="exampleFormControlTextarea1"
+        rows="3"
+      ></textarea>
+      <label for="exampleFormControlInput1" class="form-label">Price</label>
+      <input
+        type="Price"
+        v-model="product.price"
+        class="form-control"
+        id="exampleFormControlInput1"
+        placeholder="Enter Product Price"
+      />
+      <label for="exampleFormControlInput1" class="form-label">Tags</label>
+      <input
+        type="tags"
+        v-model="tags"
+        class="form-control"
+        id="exampleFormControlInput1"
+        placeholder="Enter Product Tags"
+      />
+      <label class="form-label" for="customFile"
+        >Upload the image for the product</label
+      >
+      <input
+        @change="uploadimage"
+        type="file"
+        class="form-control"
+        id="customFile"
+      />
     </div>
-  </div>
-
-  <!-- Modal -->
-  <div
-    id="product"
-    tabindex="-1"
-    role="dialog"
-    aria-labelledby="editLabel"
-    aria-hidden="true"
-  >
-    <div class="modal-dialog modal-lg" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="editLabel">Edit Product</h5>
-          <button
-            type="button"
-            class="close"
-            data-dismiss="modal"
-            aria-label="Close"
-          >
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <div class="row">
-            <!-- main product -->
-            <div class="col-md-8">
-              <div class="form-group">
-                <input
-                  type="text"
-                  placeholder="Product Name"
-                  v-model="product.name"
-                  class="form-control"
-                />
-              </div>
-
-              <div class="form-group">
-                <input v-model="product.description" />
-              </div>
-            </div>
-            <!-- product sidebar -->
-            <div class="col-md-4">
-              <h4 class="display-6">Product Details</h4>
-              <hr />
-
-              <div class="form-group">
-                <input
-                  type="text"
-                  placeholder="Product price"
-                  v-model="product.price"
-                  class="form-control"
-                />
-              </div>
-
-              <div class="form-group">
-                <input
-                  type="text"
-                  @keyup.188="addTag"
-                  placeholder="Product tags"
-                  v-model="tag"
-                  class="form-control"
-                />
-
-                <div class="d-flex">
-                  <p v-for="tag in product.tags">
-                    <span class="p-1">{{ tag }}</span>
-                  </p>
-                </div>
-              </div>
-
-              <div class="form-group">
-                <label for="product_image">Product Images</label>
-                <input type="file" @change="uploadImage" class="form-control" />
-              </div>
-
-              <div class="form-group d-flex">
-                <div class="p-1" v-for="(image, index) in product.images">
-                  <div class="img-wrapp">
-                    <img :src="image" alt="" width="80px" />
-                    <span class="delete-img" @click="deleteImage(image, index)"
-                      >X</span
-                    >
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">
-            Close
-          </button>
-          <button
-            @click="addProduct()"
-            type="button"
-            class="btn btn-primary"
-            v-if="modal == 'new'"
-          >
-            Save changes
-          </button>
-          <button
-            @click="updateProduct()"
-            type="button"
-            class="btn btn-primary"
-            v-if="modal == 'edit'"
-          >
-            Apply changes
-          </button>
+    <div class="form-group d-flex">
+      <div class="p-1" v-for="(image, index) in product.images">
+        <div class="h-100 w-100">
+          <img :src="image" alt="" />
+          <span class="delete-img" @click="deleteImage(image, index)">X</span>
         </div>
       </div>
     </div>
+
+    <!-- <div class="form-group">
+      <label for="product_image">Product Images</label>
+      <input type="file" @change="uploadImage" class="form-control" />
+    </div> -->
+    <button @click="addProduct()" type="button" class="mt-3 btn btn-primary">
+      Add Product
+    </button>
+    <div class="mb-3"></div>
   </div>
+
+  <!-- Create Product Table -->
+
+  <!-- Create Modal for Updating Product -->
 </template>
 
 <script>
+import Swal from "sweetalert2";
 import { fb, db } from "../Firebase";
 export default {
   name: "Products",
@@ -142,54 +93,28 @@ export default {
       tag: null,
     };
   },
-  firestore() {
-    return {
-      products: db.collection("products"),
-    };
-  },
   methods: {
     deleteImage(img, index) {
       let image = fb.storage().refFromURL(img);
       this.product.images.splice(index, 1);
-      image
-        .delete()
-        .then(function () {
-          console.log("image deleted");
-        })
-        .catch(function (error) {
-          // Uh-oh, an error occurred!
-          console.log("an error occurred");
+      image.delete().then(() => {
+        Swal.fire({
+          icon: "success",
+          title: "Image Deleted",
+          showConfirmButton: false,
+          timer: 1500,
         });
+      });
     },
-    addTag() {
-      this.product.tags.push(this.tag);
-      this.tag = "";
-    },
-    uploadImage(e) {
-      if (e.target.files[0]) {
+    uploadimage(e) {
+      if (e.target.files.length > 0) {
         let file = e.target.files[0];
-
-        var storageRef = fb
-          .storage()
-          .ref("products/" + Math.random() + "_" + file.name);
-
-        let uploadTask = storageRef.put(file);
-
-        uploadTask.on(
-          "state_changed",
-          (snapshot) => {},
-          (error) => {
-            // Handle unsuccessful uploads
-          },
-          () => {
-            // Handle successful uploads on complete
-            // For instance, get the download URL: https://firebasestorage.googleapis.com/...
-
-            uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
-              this.product.images.push(downloadURL);
-            });
-          }
-        );
+        let storageRef = fb.storage().ref("products/" + file.name);
+        storageRef.put(file).then((snapshot) => {
+          snapshot.ref.getDownloadURL().then((url) => {
+            this.product.images.push(url);
+          });
+        });
       }
     },
     reset() {
@@ -201,69 +126,58 @@ export default {
         images: [],
       };
     },
-    addNew() {
-      this.modal = "new";
-      this.reset();
-      $("#product").modal("show");
+    addtag() {
+      console.log("addtag");
+      this.product.tags.push(this.tag);
+      this.tag = null;
     },
-    updateProduct() {
-      this.$firestore.products.doc(this.product.id).update(this.product);
-      Toast.fire({
-        type: "success",
-        title: "Updated  successfully",
-      });
-      $("#product").modal("hide");
-    },
-    editProduct(product) {
-      this.modal = "edit";
-      this.product = product;
-      $("#product").modal("show");
-    },
-    deleteProduct(doc) {
-      Swal.fire({
-        title: "Are you sure?",
-        text: "You won't be able to revert this!",
-        type: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Yes, delete it!",
-      }).then((result) => {
-        if (result.value) {
-          this.$firestore.products.doc(doc.id).delete();
-          Toast.fire({
-            type: "success",
-            title: "Deleted  successfully",
+    readData() {
+      db.collection("products")
+        .get()
+        .then((querySnapshot) => {
+          querySnapshot.forEach((doc) => {
+            this.products.push(doc);
           });
-        }
-      });
+          console.log(this.products);
+        });
     },
-    readData() {},
     addProduct() {
-      this.$firestore.products.add(this.product);
-
-      Toast.fire({
-        type: "success",
-        title: "Product created successfully",
+      db.collection("products")
+        .add(this.product)
+        .then((docRef) => {
+          console.log("Document written with ID: ", docRef.id);
+          this.readData();
+          this.reset();
+          this.$router.push("/admin/products");
+        })
+        .catch((error) => {
+          console.error("Error adding document: ", error);
+        });
+      Swal.fire({
+        icon: "success",
+        title: "Product Added Successfully",
+        showConfirmButton: false,
+        timer: 1500,
       });
-      $("#product").modal("hide");
     },
   },
-  created() {},
+  created() {
+    this.readData();
+  },
 };
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-.img-wrapp {
-  position: relative;
-}
-.img-wrapp span.delete-img {
-  position: absolute;
-  top: -14px;
-  left: -2px;
-}
-.img-wrapp span.delete-img:hover {
-  cursor: pointer;
-}
+// .img-wrapp {
+//   position: relative;
+// }
+// .img-wrapp span.delete-img {
+//   position: absolute;
+//   top: -14px;
+//   left: -2px;
+// }
+// .img-wrapp span.delete-img:hover {
+//   cursor: pointer;
+// }
 </style>

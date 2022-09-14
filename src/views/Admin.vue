@@ -29,8 +29,8 @@
             </div>
             <div class="user-info">
               <span class="user-name"
-                >Hemanshu
-                <strong>Upadhyay</strong>
+                >{{ name }}
+                <strong></strong>
               </span>
               <span class="user-role"> {{ email }} </span>
               <span class="user-status">
@@ -41,20 +41,7 @@
           </div>
           <!-- sidebar-search  -->
           <div class="sidebar-item sidebar-search">
-            <div>
-              <div class="input-group">
-                <input
-                  type="text"
-                  class="form-control search-menu"
-                  placeholder="Search..."
-                />
-                <div class="input-group-append">
-                  <span class="input-group-text">
-                    <i class="fa fa-search" aria-hidden="true"></i>
-                  </span>
-                </div>
-              </div>
-            </div>
+            <div></div>
           </div>
           <!-- sidebar-menu  -->
           <div class="sidebar-item sidebar-menu">
@@ -112,7 +99,7 @@
 <script>
 // @ is an alias to /src
 import Hero from "@/components/Hero.vue";
-import { fb } from "@/Firebase";
+import { fb, getAuth, db } from "@/Firebase";
 export default {
   name: "Admin",
   data() {
@@ -138,6 +125,24 @@ export default {
           alert(error.message);
         });
     },
+  },
+  created() {
+    // Get the name of the user from the database
+
+    const user = getAuth().currentUser;
+    getAuth().onAuthStateChanged((user) => {
+      if (user) {
+        db.collection("profiles")
+          .doc(getAuth().currentUser.uid)
+          .get()
+          .then((doc) => {
+            this.name = doc.data().name;
+          });
+        this.email = user.email;
+      } else {
+        this.$router.push("/login");
+      }
+    });
   },
 };
 </script>

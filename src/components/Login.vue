@@ -13,6 +13,7 @@
             v-model="email"
             class="form-control"
             v-model.trim="email"
+            required
           />
         </div>
         <div class="form-group">
@@ -22,6 +23,7 @@
             type="password"
             class="form-control"
             v-model.trim="password"
+            required
           />
         </div>
 
@@ -55,6 +57,12 @@ export default {
       fb.auth()
         .signInWithEmailAndPassword(this.email, this.password)
         .then(() => {
+          Swal.fire({
+            icon: "success",
+            title: "Signin Successful",
+            showConfirmButton: false,
+            timer: 1500,
+          });
           this.$router.replace("admin");
         })
         .catch(function (error) {
@@ -62,38 +70,19 @@ export default {
           var errorCode = error.code;
           var errorMessage = error.message;
           if (errorCode === "auth/wrong-password") {
-            alert("Wrong password.");
-          } else {
-            alert(errorMessage);
-          }
-          console.log(error);
-        });
-    },
-    register() {
-      fb.auth()
-        .createUserWithEmailAndPassword(this.email, this.password)
-        .then((user) => {
-          db.collection("profiles")
-            .doc(user.user.uid)
-            .set({
-              name: this.name,
-            })
-            .then(function () {
-              console.log("Document successfully written!");
-            })
-            .catch(function (error) {
-              console.error("Error writing document: ", error);
+            Swal.fire({
+              icon: "error",
+              title: "Wrong Password, Please Try Again",
+              showConfirmButton: true,
+              timer: 2000,
             });
-          this.$router.replace("admin");
-        })
-        .catch(function (error) {
-          // Handle Errors here.
-          var errorCode = error.code;
-          var errorMessage = error.message;
-          if (errorCode == "auth/weak-password") {
-            alert("The password is too weak.");
           } else {
-            alert(errorMessage);
+            Swal.fire({
+              icon: "error",
+              title: errorMessage,
+              showConfirmButton: true,
+              timer: 2000,
+            });
           }
           console.log(error);
         });

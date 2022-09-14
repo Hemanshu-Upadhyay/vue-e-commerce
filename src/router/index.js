@@ -7,6 +7,7 @@ import Login from "../components/Login.vue";
 import Signup from "../components/Signup.vue";
 import { fb } from "@/Firebase";
 import AddProducts from "../components/AddProducts.vue";
+import Profile from "../components/Profile.vue";
 
 const routes = [
   {
@@ -42,6 +43,16 @@ const routes = [
         path: "Products",
         name: "products",
         component: Products,
+      },
+      {
+        path: "addproducts",
+        name: "addproducts",
+        component: AddProducts,
+      },
+      {
+        path: "profile",
+        name: "profile",
+        component: Profile,
       },
     ],
   },
