@@ -1,9 +1,15 @@
 import { createStore } from "vuex";
 
 export default createStore({
-  state: {},
+  state: {
+    cart: [],
+  },
   getters: {},
-  mutations: {},
+  mutations: {
+    addtocart(state, payload) {
+      state.cart.push(payload);
+    },
+  },
   actions: {},
   modules: {},
 });

@@ -49,7 +49,9 @@
       <div class="p-1" v-for="(image, index) in product.images">
         <div class="h-100 w-100">
           <img :src="image" alt="" />
-          <span class="delete-img" @click="deleteImage(image, index)">X</span>
+          <span class="delete-img" @click="deleteImage(image, index)"
+            >Delete Image</span
+          >
         </div>
       </div>
     </div>
@@ -80,6 +82,7 @@ export default {
   },
   data() {
     return {
+      imageupload: false,
       products: [],
       product: {
         name: null,
@@ -107,12 +110,23 @@ export default {
       });
     },
     uploadimage(e) {
+      Toast.fire({
+        icon: "info",
+        title: "Uploading Image",
+      });
       if (e.target.files.length > 0) {
         let file = e.target.files[0];
         let storageRef = fb.storage().ref("products/" + file.name);
         storageRef.put(file).then((snapshot) => {
           snapshot.ref.getDownloadURL().then((url) => {
             this.product.images.push(url);
+            Toast.fire({
+              icon: "success",
+              title: "Image Uploaded",
+              showConfirmButton: false,
+              timer: 1500,
+            });
+            this.imageupload = true;
           });
         });
       }
@@ -142,23 +156,33 @@ export default {
         });
     },
     addProduct() {
-      db.collection("products")
-        .add(this.product)
-        .then((docRef) => {
-          console.log("Document written with ID: ", docRef.id);
-          this.readData();
-          this.reset();
-          this.$router.push("/admin/products");
-        })
-        .catch((error) => {
-          console.error("Error adding document: ", error);
+      if (this.imageupload) {
+        db.collection("products")
+          .add(this.product)
+          .then((docRef) => {
+            console.log("Document written with ID: ", docRef.id);
+            this.readData();
+            this.reset();
+            this.$router.push("/admin/products");
+          })
+          .catch((error) => {
+            console.error("Error adding document: ", error);
+          });
+        Swal.fire({
+          icon: "success",
+          title: "Product Added Successfully",
+          showConfirmButton: false,
+          timer: 1500,
         });
-      Swal.fire({
-        icon: "success",
-        title: "Product Added Successfully",
-        showConfirmButton: false,
-        timer: 1500,
-      });
+        this.imageupload = false;
+      } else {
+        Toast.fire({
+          icon: "error",
+          title: "Please Wait while We Upload the Image",
+          showConfirmButton: false,
+          timer: 1500,
+        });
+      }
     },
   },
   created() {

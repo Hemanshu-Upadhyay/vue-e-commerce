@@ -1,7 +1,7 @@
 <template>
   <Navbar />
   <Hero />
-  <Products />
+  <ProductList />
   <br />
   <router-view />
   <div class="home">
@@ -35,8 +35,10 @@
 // @ is an alias to /src
 import Hero from "../components/Hero.vue";
 import Products from "../../Sections/Products.vue";
+
 import Navbar from "@/components/Navbar.vue";
 import Login from "@/components/Login.vue";
+import ProductList from "../../Sections/ProductList.vue";
 
 export default {
   name: "Home",
@@ -45,6 +47,7 @@ export default {
     Products,
     Navbar,
     Login,
+    ProductList,
   },
 };
 </script>

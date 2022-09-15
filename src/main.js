@@ -4,6 +4,7 @@ import router from "./router";
 import store from "./store";
 import "./assets/app.scss";
 import "popper.js";
+import Vue2Filters from "vue2-filters";
 import jQuery from "jquery";
 import { fb } from "./Firebase";
 window.$ = window.jQuery = jQuery;
@@ -31,5 +32,3 @@ fb.auth().onAuthStateChanged((user) => {
   //   store.dispatch("fetchUserProfile", user);
   // }
 });
-
-// createApp(App).use(store).use(router).mount("#app");
